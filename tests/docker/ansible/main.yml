@@ -1,0 +1,9 @@
+- hosts: asterisk
+  gather_facts: no
+  pre_tasks:
+    - name: Update all packages
+      raw: apt-get update
+    - name: Install python
+      raw: apt-get install -y python python-apt git aptitude
+  roles:
+    - Yannik.asterisk

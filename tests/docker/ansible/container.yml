@@ -1,0 +1,6 @@
+version: "2"
+services:
+  asterisk:
+    image: debian:jessie
+
+registries: {}

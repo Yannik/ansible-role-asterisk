@@ -11,9 +11,19 @@ addons:
     - python-pip
     - python-apt
 
+services:
+  - docker
+
+env:
+  global:
+    DOCKER_USER: yanniksembritzki
+    secure: dKq5NdQ/70SCACzW8LXleahRxoEhXexmUZspA/XyGEM3McTGjIPLxnNCbAsgZ3YNy+hrHpg4+EYPWACO/Sl+1bH53EX5TryaWBoCrF6DJF7B3JVwfH37xB7z/pSaKTD1txq/8GyMjCPWhCLeVHsQ/G/p63wzbRzu4iFSNo7B48graMRB+ee3Fh5yc+8O1VKwKEyQVEUSlRo031/uJ6FFAdJnTez6YO/tyUzpo7yJFY/n9QX+R/2ohoP8hDrmTHhXxWmsV73JGhXNqBj2Xv4viY2ZMyKVvaQ8OdOvtfsnvzeO2TvB4FdnGvM1N4tSwWNODXdX4agMQ1hAAHcKaIsO8tYbRUpTwbTJccLb8dYPFNU16fnjHgOyqyoMKAtUAVS6ZzUTNjuMBUKPUJhc8Vy1cnSaL0FsUflveagCxs1KYxQLXt0XOqKGT7B/70epOZKL4qbZdgHtB7sa4oE2tcA+2oPBEZy5+Wx+YwyZjzE1xpS1pd/MuI60xB1hAPvyQRrP2baQibjmMyighCK/ccnl88dgam88sk5Eh/vQTgZ/s1QOHQ/CezIi8QbCCorxtBU2au42aGVUdc9HAMIzmWv0NDPPjM/LeN291jH4QdBAfYYmX87tO1R0xgGgCxMbo2lCjSwCQj3E66Ae2roCxSLd6KTAcCKRxua9P5Z0bsxnpRI=
+
 install:
   # Install ansible
   - pip install ansible
+
+  - git clone https://github.com/ansible/ansible-container.git && cd ansible-container && python ./setup.py install && cd ..
 
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
@@ -31,6 +41,10 @@ script:
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
+
+after_success:
+ - docker login -u $DOCKER_USER -p $DOCKER_PASS
+ - cd tests/docker && ansible-container build && ansible-container push
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
