@@ -44,7 +44,7 @@ script:
 
 after_success:
  - cd tests/docker && ansible-container build
- - ansible-container push --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --push-to docker
+ - ansible-container push --username "${DOCKER_USER}" --password "${DOCKER_PASS}"
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
