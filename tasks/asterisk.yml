@@ -67,3 +67,10 @@
   command: make install-logrotate chdir={{ asterisk_src_dir }}
   changed_when: false
 
+- name: Remove /usr/src/asterisk when running on docker
+  file: path=/usr/src/asterisk state=absent
+  when: ansible_connection == 'docker'
+
+- name: Purge apt cache
+  command: apt-get clean
+  when: ansible_connection == 'docker'
