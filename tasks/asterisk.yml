@@ -71,3 +71,6 @@
   file: path=/usr/src/asterisk state=absent
   when: ansible_connection == 'docker'
 
+- name: Purge apt cache
+  command: apt clean
+  when: ansible_connection == 'docker'
