@@ -72,5 +72,5 @@
   when: ansible_connection == 'docker'
 
 - name: Purge apt cache
-  command: apt clean
+  command: apt-get clean
   when: ansible_connection == 'docker'
