@@ -3,4 +3,7 @@ services:
   asterisk:
     image: debian:jessie
 
-registries: {}
+registries:
+  docker:
+    url: https://index.docker.io/v1/
+    namespace: yanniksembritzki/asterisk
