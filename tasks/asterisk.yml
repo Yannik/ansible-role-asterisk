@@ -27,9 +27,11 @@
 
 - name: Configure asterisk
   command: ./configure {{ asterisk_configure_options }} chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Create menuselect.makeopts
   command: make menuselect.makeopts chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Do a bit of menuselect configuration
   command: "{{ item }} chdir={{ asterisk_src_dir }}"
@@ -38,23 +40,30 @@
     - menuselect/menuselect --enable CORE-SOUNDS-EN-WAV --enable CORE-SOUNDS-EN-G722
     - menuselect/menuselect  --enable EXTRA-SOUNDS-EN-GSM --enable EXTRA-SOUNDS-EN-WAV --enable EXTRA-SOUNDS-EN-G722
     - menuselect/menuselect  --enable MOH-OPSOUND-WAV --enable MOH-OPSOUND-GSM --enable MOH-OPSOUND-G722
+  changed_when: false
 
 - name: Run custom pre-make commands
   command: "{{ item }} chdir={{ iasterisk_srcdir }}"
   with_items: "{{ asterisk_pre_make_commands }}"
+  changed_when: false
 
 - name: Make
   command: make {{ asterisk_make_options }} chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Uninstall previous version
   command: make uninstall chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Install
   command: make install chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Install initscripts
   command: make config chdir={{ asterisk_src_dir }}
+  changed_when: false
 
 - name: Install logrotate
   command: make install-logrotate chdir={{ asterisk_src_dir }}
+  changed_when: false
 
