@@ -18,6 +18,9 @@ env:
   global:
     - DOCKER_USER=yanniksembritzki
     - secure: dKq5NdQ/70SCACzW8LXleahRxoEhXexmUZspA/XyGEM3McTGjIPLxnNCbAsgZ3YNy+hrHpg4+EYPWACO/Sl+1bH53EX5TryaWBoCrF6DJF7B3JVwfH37xB7z/pSaKTD1txq/8GyMjCPWhCLeVHsQ/G/p63wzbRzu4iFSNo7B48graMRB+ee3Fh5yc+8O1VKwKEyQVEUSlRo031/uJ6FFAdJnTez6YO/tyUzpo7yJFY/n9QX+R/2ohoP8hDrmTHhXxWmsV73JGhXNqBj2Xv4viY2ZMyKVvaQ8OdOvtfsnvzeO2TvB4FdnGvM1N4tSwWNODXdX4agMQ1hAAHcKaIsO8tYbRUpTwbTJccLb8dYPFNU16fnjHgOyqyoMKAtUAVS6ZzUTNjuMBUKPUJhc8Vy1cnSaL0FsUflveagCxs1KYxQLXt0XOqKGT7B/70epOZKL4qbZdgHtB7sa4oE2tcA+2oPBEZy5+Wx+YwyZjzE1xpS1pd/MuI60xB1hAPvyQRrP2baQibjmMyighCK/ccnl88dgam88sk5Eh/vQTgZ/s1QOHQ/CezIi8QbCCorxtBU2au42aGVUdc9HAMIzmWv0NDPPjM/LeN291jH4QdBAfYYmX87tO1R0xgGgCxMbo2lCjSwCQj3E66Ae2roCxSLd6KTAcCKRxua9P5Z0bsxnpRI=
+  matrix:
+    - DOCKER=true
+    - DOCKER=false
 
 install:
   # Install ansible
@@ -29,22 +32,21 @@ install:
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
 script:
-  # Syntax check
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  # Test role locally
+  - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
+  - >
+    ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
 
-  # Run playbook
-  #- ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
-
-  # Run playbook again to check idempotency
-  #- >
-  #  ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
-  #  | grep -q 'changed=0.*failed=0'
-  #  && (echo 'Idempotence test: pass' && exit 0)
-  #  || (echo 'Idempotence test: fail' && exit 1)
-
-after_success:
- - cd tests/docker && ansible-container build
- - ansible-container push --username "${DOCKER_USER}" --password "${DOCKER_PASS}"
+  # Build docker container
+  - ${DOCKER} && cd tests/docker && ansible-container build 2>&1 | tee build.log || true
+  - ${DOCKER} && docker login --username "${DOCKER_USER}" --password "${DOCKER_PASS}" || true
+  - ${DOCKER} && hash=$(cat build.log | grep "Exported.*with image ID" | sed 's/.*sha256:\(.*\)/\1/g') || true
+  - ${DOCKER} && docker tag $hash ${DOCKER_USER}/asterisk:latest || true
+  - ${DOCKER} && docker push ${DOCKER_USER}/asterisk:latest || true
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
