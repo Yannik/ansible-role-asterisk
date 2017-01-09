@@ -26,9 +26,9 @@
   when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
   register: asterisk_build_deps
 
-- name: Print dependencies to remove
+- name: Print dependencies to be installed
   debug: msg={{asterisk_build_deps.stdout}}
-  when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
+  when: not asterisk_build_deps|skipped
 
 - name: Let asterisk install dependencies
   shell: export DEBIAN_FRONTEND=noninteractive && ./contrib/scripts/install_prereq install chdir={{ asterisk_src_dir }}
@@ -87,3 +87,6 @@
   command: apt-get purge -y --auto-remove {{ asterisk_build_deps.stdout }}
   when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
 
+- name: Install runtime dependencies when running on docker
+  command: apt-get install --no-install-recommends -y libxml2 libxslt1.1 libjansson4 libedit2 lua5.1 libmysqlclient18 unixodbc libsqlite0 libcurl3 libiksemel3 libbluetooth3 libasound2 zlib1g libspeex1 libspeexdsp1 libogg0 libspandsp2 libsrtp0 libresample1 libsnmp30 libpq5 libpopt0 libc-client2007e libcorosync4 libgsm1 libical1a libneon27 libssl1.0.0 libvorbis0a libvorbisenc2 libvorbisfile3 libldap-2.4-2 libjack0  uuid
+  when: not asterisk_build_deps|skipped and ansible_connection == 'docker'

@@ -12,4 +12,4 @@
       raw: apt-get purge -y --auto-remove python python-apt git aptitude
     - raw: apt-get clean
     - name: Remove files
-      raw: rm -rf /var/log/*; rm -rf /tmp; rm -rf /var/lib/apt/lists/*
+      raw: rm -rf /var/log/*; rm -rf /tmp/*; rm -rf /var/lib/apt/lists/*
