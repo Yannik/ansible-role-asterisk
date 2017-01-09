@@ -2,4 +2,4 @@ version: "2"
 services:
   asterisk:
     image: debian:jessie
-
+    command: ["/usr/sbin/asterisk", "-f"]

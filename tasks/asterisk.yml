@@ -18,6 +18,18 @@
   changed_when: false
   register: asterisk_install_prereq_md5sum_new
 
+- name: Check installable dependencies
+  shell: >
+    {{ asterisk_src_dir }}/contrib/scripts/install_prereq test \
+    | grep "aptitude install -y" \
+    | sed 's/aptitude install -y //g'
+  when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
+  register: asterisk_build_deps
+
+- name: Print dependencies to remove
+  debug: msg={{asterisk_build_deps.stdout}}
+  when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
+
 - name: Let asterisk install dependencies
   shell: export DEBIAN_FRONTEND=noninteractive && ./contrib/scripts/install_prereq install chdir={{ asterisk_src_dir }}
   when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
@@ -39,7 +51,7 @@
     - menuselect/menuselect --enable format_mp3
     - menuselect/menuselect --enable CORE-SOUNDS-EN-WAV --enable CORE-SOUNDS-EN-G722
     - menuselect/menuselect  --enable EXTRA-SOUNDS-EN-GSM --enable EXTRA-SOUNDS-EN-WAV --enable EXTRA-SOUNDS-EN-G722
-    - menuselect/menuselect  --enable MOH-OPSOUND-WAV --enable MOH-OPSOUND-GSM --enable MOH-OPSOUND-G722
+    - menuselect/menuselect  --disable MOH-OPSOUND-WAV --disable MOH-OPSOUND-GSM --disable MOH-OPSOUND-G722
   changed_when: false
 
 - name: Run custom pre-make commands
@@ -71,6 +83,7 @@
   file: path=/usr/src/asterisk state=absent
   when: ansible_connection == 'docker'
 
-- name: Purge apt cache
-  command: apt-get clean
-  when: ansible_connection == 'docker'
+- name: Uninstall build dependencies when running on docker
+  command: apt-get purge -y --auto-remove {{ asterisk_build_deps.stdout }}
+  when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
+
