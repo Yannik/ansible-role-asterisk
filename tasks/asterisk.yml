@@ -11,6 +11,7 @@
     version: "{{ asterisk_git_version }}"
     update: "{{ (asterisk_state == 'latest') }}"
     depth: 1
+  register: asterisk_src_download
 
 - name: Get current install_prereq md5sum
   shell: md5sum {{ asterisk_src_dir }}/contrib/scripts/install_prereq
@@ -24,6 +25,7 @@
     | grep "aptitude install -y" \
     | sed 's/aptitude install -y //g'
   when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
+        and ansible_connection == 'docker'
   register: asterisk_build_deps
 
 - name: Print dependencies to be installed
@@ -34,50 +36,43 @@
   shell: export DEBIAN_FRONTEND=noninteractive && ./contrib/scripts/install_prereq install chdir={{ asterisk_src_dir }}
   when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
 
-- name: Download mp3 source code
-  command: ./contrib/scripts/get_mp3_source.sh chdir={{ asterisk_src_dir }} creates=addons/mp3/mpg123.h
+- block:
+  - name: Download mp3 source code
+    command: ./contrib/scripts/get_mp3_source.sh chdir={{ asterisk_src_dir }} creates=addons/mp3/mpg123.h
+  
+  - name: Configure asterisk
+    command: ./configure {{ asterisk_configure_options }} chdir={{ asterisk_src_dir }}
 
-- name: Configure asterisk
-  command: ./configure {{ asterisk_configure_options }} chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Create menuselect.makeopts
-  command: make menuselect.makeopts chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Do a bit of menuselect configuration
-  command: "{{ item }} chdir={{ asterisk_src_dir }}"
-  with_items:
-    - menuselect/menuselect --enable format_mp3
-    - menuselect/menuselect --enable CORE-SOUNDS-EN-WAV --enable CORE-SOUNDS-EN-G722
-    - menuselect/menuselect  --enable EXTRA-SOUNDS-EN-GSM --enable EXTRA-SOUNDS-EN-WAV --enable EXTRA-SOUNDS-EN-G722
-    - menuselect/menuselect  --disable MOH-OPSOUND-WAV --disable MOH-OPSOUND-GSM --disable MOH-OPSOUND-G722
-  changed_when: false
-
-- name: Run custom pre-make commands
-  command: "{{ item }} chdir={{ iasterisk_srcdir }}"
-  with_items: "{{ asterisk_pre_make_commands }}"
-  changed_when: false
-
-- name: Make
-  command: make {{ asterisk_make_options }} chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Uninstall previous version
-  command: make uninstall chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Install
-  command: make install chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Install initscripts
-  command: make config chdir={{ asterisk_src_dir }}
-  changed_when: false
-
-- name: Install logrotate
-  command: make install-logrotate chdir={{ asterisk_src_dir }}
-  changed_when: false
+  - name: Create menuselect.makeopts
+    command: make menuselect.makeopts chdir={{ asterisk_src_dir }}
+  
+  - name: Do a bit of menuselect configuration
+    command: "{{ item }} chdir={{ asterisk_src_dir }}"
+    with_items:
+      - menuselect/menuselect --enable format_mp3
+      - menuselect/menuselect --enable CORE-SOUNDS-EN-WAV --enable CORE-SOUNDS-EN-G722
+      - menuselect/menuselect  --enable EXTRA-SOUNDS-EN-GSM --enable EXTRA-SOUNDS-EN-WAV --enable EXTRA-SOUNDS-EN-G722
+      - menuselect/menuselect  --disable MOH-OPSOUND-WAV --disable MOH-OPSOUND-GSM --disable MOH-OPSOUND-G722
+  
+  - name: Run custom pre-make commands
+    command: "{{ item }} chdir={{ iasterisk_srcdir }}"
+    with_items: "{{ asterisk_pre_make_commands }}"
+  
+  - name: Make
+    command: make {{ asterisk_make_options }} chdir={{ asterisk_src_dir }}
+  
+  - name: Uninstall previous version
+    command: make uninstall chdir={{ asterisk_src_dir }}
+  
+  - name: Install
+    command: make install chdir={{ asterisk_src_dir }}
+  
+  - name: Install initscripts
+    command: make config chdir={{ asterisk_src_dir }}
+  
+  - name: Install logrotate
+    command: make install-logrotate chdir={{ asterisk_src_dir }}
+  when: asterisk_src_download|changed
 
 - name: Remove /usr/src/asterisk when running on docker
   file: path=/usr/src/asterisk state=absent
