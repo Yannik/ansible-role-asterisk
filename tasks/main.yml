@@ -1,2 +1,2 @@
-- include: asterisk.yml
+- import_tasks: asterisk.yml
   tags: asterisk
