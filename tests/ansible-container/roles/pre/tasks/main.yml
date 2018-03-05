@@ -1,0 +1,4 @@
+- name: Update all packages
+  raw: apt-get update
+- name: Install git
+  raw: apt-get install -y git

@@ -1,10 +1,12 @@
 version: "2"
 settings:
   conductor:
-    base: debian:stretch
+    base: debian:jessie
 services:
   asterisk:
-    from: debian:stretch
+    from: debian:jessie
     roles:
+      - pre
       - Yannik.asterisk
+      - post
     command: ["/usr/sbin/asterisk", "-f"]
