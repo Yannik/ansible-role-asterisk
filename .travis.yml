@@ -42,7 +42,7 @@ script:
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Build docker container
-  - ${DOCKER} && cd tests/ansible-container && ansible-container build 2>&1 | tee build.log || true
+  - ${DOCKER} && cd tests/ansible-container && ansible-container --debug build 2>&1 | tee build.log || true
   - ${DOCKER} && docker login --username "${DOCKER_USER}" --password "${DOCKER_PASS}" || true
   - ${DOCKER} && hash=$(cat build.log | grep "Exported.*with image ID" | sed 's/.*sha256:\(.*\)/\1/g') || true
   - ${DOCKER} && docker tag $hash ${DOCKER_USER}/asterisk:latest || true
