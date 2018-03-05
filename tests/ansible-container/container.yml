@@ -1,10 +1,17 @@
 version: "2"
 settings:
   conductor:
-    base: debian:jessie
+    base: debian:stretch
 services:
   asterisk:
-    from: debian:jessie
+    from: debian:stretch
     roles:
+      - pre
       - Yannik.asterisk
+      - post
     command: ["/usr/sbin/asterisk", "-f"]
+registries:
+  docker:
+    url: https://docker.io
+    namespace: yanniksembritzki
+    repository_prefix: ''
