@@ -48,7 +48,7 @@ script:
   #- ${DOCKER} && hash=$(cat build.log | grep "Exported.*with image ID" | sed 's/.*sha256:\(.*\)/\1/g') || true
   #- ${DOCKER} && docker tag $hash ${DOCKER_USER}/asterisk:latest || true
   #- ${DOCKER} && docker push ${DOCKER_USER}/asterisk:latest || true
-  - ${DOCKER} && ansible-container push --tag latest
+  - ${DOCKER} && ansible-container push --push-to docker --tag latest
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
