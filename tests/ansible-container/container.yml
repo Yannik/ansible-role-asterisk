@@ -10,8 +10,3 @@ services:
       - Yannik.asterisk
       - post
     command: ["/usr/sbin/asterisk", "-f"]
-registries:
-  docker:
-    url: https://docker.io
-    namespace: yanniksembritzki
-    repository_prefix: ''
