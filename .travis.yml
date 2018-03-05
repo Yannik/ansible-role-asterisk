@@ -42,10 +42,11 @@ script:
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Build docker container
-  - '! ${DOCKER} || cd tests/ansible-container && ansible-container --debug build 2>&1'
-  - '! ${DOCKER} || touch docker.json'
-  - '! ${DOCKER} || export DOCKER_CONFIG=$(pwd)/docker.json' # ansible-container mysteriously fails if using the default ($HOME/.docker/config.json)
-  - '! ${DOCKER} || ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest'
+  # (docker has problems with ! at the beginning of a string, therefore we use `test ! $BOOL`)
+  - test ! ${DOCKER} || cd tests/ansible-container && ansible-container --debug build 2>&1
+  - test ! ${DOCKER} || touch docker.json
+  - test ! ${DOCKER} || export DOCKER_CONFIG=$(pwd)/docker.json # ansible-container mysteriously fails if using the default ($HOME/.docker/config.json)
+  - test ! ${DOCKER} || ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
