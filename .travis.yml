@@ -53,7 +53,8 @@ script:
   - ls -alsh "$HOME/.docker" || true
   - ls -alsh "$HOME" || true
   - cat "$HOME/.docker/config.json" || true
-  - ${DOCKER} && ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
+  - echo "{}" >> docker_config.json
+  - ${DOCKER} && export DOCKER_CONFIG=$(pwd)/docker_config.json && ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
