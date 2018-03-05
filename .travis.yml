@@ -45,8 +45,9 @@ script:
   - ls -alsh "$HOME/.docker" || true
   - ls -alsh "$HOME" || true
   - ${DOCKER} && cd tests/ansible-container && ansible-container --debug build 2>&1 | tee build.log || true
-  - touch docker.json
-  - ${DOCKER} && export DOCKER_CONFIG=$(pwd)/docker.json && ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
+  - ${DOCKER} && touch docker.json
+  - ${DOCKER} && export DOCKER_CONFIG=$(pwd)/docker.json # ansible-container mysteriously fails if using the default ($HOME/.docker/config.json)
+  - ${DOCKER} && ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
