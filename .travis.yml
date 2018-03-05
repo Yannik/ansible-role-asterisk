@@ -43,7 +43,7 @@ script:
 
   # Build docker container
   # (docker has problems with ! at the beginning of a string, therefore we use quotes)
-  - '! ${DOCKER} || cd tests/ansible-container && ansible-container --debug build 2>&1'
+  - '! ${DOCKER} || (cd tests/ansible-container && ansible-container --debug build 2>&1)'
   - '! ${DOCKER} || touch docker.json'
   - '! ${DOCKER} || export DOCKER_CONFIG=$(pwd)/docker.json' # ansible-container mysteriously fails if using the default ($HOME/.docker/config.json)
   - '! ${DOCKER} || ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest'
