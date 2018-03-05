@@ -44,9 +44,11 @@ script:
   # Build docker container
   - ${DOCKER} && docker login --username "${DOCKER_USER}" --password "${DOCKER_PASS}" || true
   - ${DOCKER} && cd tests/ansible-container && ansible-container --debug build 2>&1 | tee build.log || true
-  - ${DOCKER} && hash=$(cat build.log | grep "Exported.*with image ID" | sed 's/.*sha256:\(.*\)/\1/g') || true
-  - ${DOCKER} && docker tag $hash ${DOCKER_USER}/asterisk:latest || true
-  - ${DOCKER} && docker push ${DOCKER_USER}/asterisk:latest || true
+  #- ${DOCKER} && cd tests/ansible-container && ansible-container --debug build 2>&1 | tee build.log || true
+  #- ${DOCKER} && hash=$(cat build.log | grep "Exported.*with image ID" | sed 's/.*sha256:\(.*\)/\1/g') || true
+  #- ${DOCKER} && docker tag $hash ${DOCKER_USER}/asterisk:latest || true
+  #- ${DOCKER} && docker push ${DOCKER_USER}/asterisk:latest || true
+  - ${DOCKER} && cd tests/ansible-container && ansible-container push --tag ${DOCKER_USER}/asterisk:latest
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
