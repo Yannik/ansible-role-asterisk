@@ -52,6 +52,7 @@ script:
   #- ${DOCKER} && docker push ${DOCKER_USER}/asterisk:latest || true
   - ls -alsh "$HOME/.docker" || true
   - ls -alsh "$HOME" || true
+  - touch docker.json
   - ${DOCKER} && export DOCKER_CONFIG=docker.json && ansible-container push --push-to docker --username "${DOCKER_USER}" --password "${DOCKER_PASS}" --tag latest
 
 notifications:
