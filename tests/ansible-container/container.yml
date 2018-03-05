@@ -4,5 +4,5 @@ settings:
     base: debian:jessie
 services:
   asterisk:
-    image: debian:jessie
+    from: debian:jessie
     command: ["/usr/sbin/asterisk", "-f"]
