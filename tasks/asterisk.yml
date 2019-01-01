@@ -88,6 +88,10 @@
   file: path=/usr/src/asterisk state=absent
   when: ansible_connection == 'docker'
 
+- name: Uninstall corrupt dh-python package (otherwise the next command fails)
+  command: apt purge -y dh-python
+  when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
+
 - name: Uninstall build dependencies when running on docker
   command: apt-get purge -y --auto-remove {{ asterisk_build_deps.stdout }}
   when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
