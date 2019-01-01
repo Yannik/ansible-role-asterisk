@@ -1,6 +1,6 @@
 asterisk_git_version: 16
 asterisk_src_dir: /usr/src/asterisk/
 asterisk_state: latest
-asterisk_configure_options: --with-pjproject-bundled
+asterisk_configure_options: --with-pjproject-bundled --with-jansson-bundled
 asterisk_pre_make_commands: []
 asterisk_make_options: "-j4"
