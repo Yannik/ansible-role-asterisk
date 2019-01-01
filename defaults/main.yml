@@ -1,4 +1,4 @@
-asterisk_git_version: 13.13
+asterisk_git_version: 16
 asterisk_src_dir: /usr/src/asterisk/
 asterisk_state: latest
 asterisk_configure_options: --with-pjproject-bundled
