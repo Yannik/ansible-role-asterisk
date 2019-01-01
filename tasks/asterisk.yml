@@ -77,6 +77,9 @@
   - name: Install initscripts
     command: make config chdir={{ asterisk_src_dir }}
   
+  - name: Install config
+    command: make samples chdir={{ asterisk_src_dir }}
+
   - name: Install logrotate
     command: make install-logrotate chdir={{ asterisk_src_dir }}
   when: asterisk_src_download|changed
