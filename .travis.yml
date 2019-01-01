@@ -10,6 +10,7 @@ addons:
     packages:
     - python-pip
     - python-apt
+    - build-essential
 
 services:
   - docker
@@ -26,7 +27,11 @@ install:
   # Install ansible
   - pip install ansible
 
-  - pip install 'ansible-container[docker]'
+  # https://github.com/ansible/ansible-container/issues/919
+  - pip install sa-ansible-container[docker]
+  
+  # otherwise install_prereq makes problems
+  - ${DOCKER} || sudo apt upgrade -y
 
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
@@ -34,7 +39,7 @@ install:
 script:
   # Test role locally
   - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-  - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
+  - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo -vvv
   - ${DOCKER} || ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo | tee idempotence-test.log
   - >
     ${DOCKER} || grep -q 'changed=0.*failed=0' idempotence-test.log
