@@ -32,6 +32,9 @@
   debug: msg={{asterisk_build_deps.stdout}}
   when: not asterisk_build_deps|skipped
 
+- name: Install aptitude (otherwise install_prereq fails)
+  apt: name=aptitude state=present
+
 - name: Let asterisk install dependencies
   shell: export DEBIAN_FRONTEND=noninteractive && ./contrib/scripts/install_prereq install chdir={{ asterisk_src_dir }}
   when: asterisk_install_prereq_md5sum.stdout != asterisk_install_prereq_md5sum_new.stdout
