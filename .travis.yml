@@ -28,6 +28,8 @@ install:
   - pip install ansible
 
   # https://github.com/ansible/ansible-container/issues/919
+  # https://github.com/geerlingguy/solr-container/commit/d3a621d4e652d3ed590b57bc1a8e2cfe2fa7cd48
+  # ansible-container is currently not maintained by ansible anymore
   - pip install sa-ansible-container[docker]
   
   # otherwise install_prereq makes problems
