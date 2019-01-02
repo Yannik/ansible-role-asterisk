@@ -1,5 +1,6 @@
 - name: Remove git
   raw: apt-get purge -y --auto-remove git
 - raw: apt-get clean
-- name: Remove files
-  raw: rm -rf /var/log/*; rm -rf /tmp/*; rm -rf /var/lib/apt/lists/*
+- raw: rm -rf /var/log/*; rm -rf /tmp/*; rm -rf /var/lib/apt/lists/*
+- raw: rm -rf /usr/src/asterisk; rm -rf /var/lib/aptitude/*
+- raw: rm -rf /var/cache/*; rm -rf /var/lib/asterisk/sounds/*

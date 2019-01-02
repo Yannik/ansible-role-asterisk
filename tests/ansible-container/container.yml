@@ -6,9 +6,7 @@ services:
   asterisk:
     from: debian:stretch
     roles:
-      - pre
       - Yannik.asterisk
-      - post
     command: ["/usr/sbin/asterisk", "-f"]
 registries:
   docker:

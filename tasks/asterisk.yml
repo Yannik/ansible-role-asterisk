@@ -1,3 +1,7 @@
+- name: Run pre role on docker
+  include_role: name=pre
+  when: ansible_connection == 'docker'
+
 - name: Get current install_prereq md5sum
   shell: md5sum {{ asterisk_src_dir }}/contrib/scripts/install_prereq
   failed_when: false
@@ -84,17 +88,6 @@
     command: make install-logrotate chdir={{ asterisk_src_dir }}
   when: asterisk_src_download|changed
 
-- name: Remove various unneeded directories on docker
-  file: "path={{item}} state=absent"
-  with_items:
-    - /usr/src/asterisk
-    - /var/lib/aptitude
-    - /var/cache
-    - /var/log
-    - /tmp
-    - /var/lib/asterisk/sounds
-  when: ansible_connection == 'docker'
-
 - name: Uninstall corrupt dh-python package (otherwise the next command fails)
   command: apt purge -y dh-python
   when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
@@ -106,3 +99,8 @@
 - name: Install runtime dependencies when running on docker
   command: apt-get install --no-install-recommends -y libxml2 libxslt1.1 libjansson4 libedit2 lua5.1 libmariadbclient18 unixodbc libsqlite0 libcurl3 libiksemel3 libbluetooth3 libasound2 zlib1g libspeex1 libspeexdsp1 libogg0 libspandsp2 libsrtp0 libresample1 libsnmp30 libpq5 libpopt0 libc-client2007e libcorosync-common4 libgsm1 libical2 libneon27 libssl1.0.2 libvorbis0a libvorbisenc2 libvorbisfile3 libldap-2.4-2 libjack0 uuid liburiparser1
   when: not asterisk_build_deps|skipped and ansible_connection == 'docker'
+
+- name: Run post role on docker
+  include_role: name=post
+  when: ansible_connection == 'docker'
+
