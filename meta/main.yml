@@ -1,6 +1,6 @@
 galaxy_info:
   author: Yannik Sembritzki
-  description: Builds and installs asterisk from source
+  description: Installs and builds asterisk from source
   company:
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -207,7 +207,7 @@ galaxy_info:
   #  - all
   #  - Any
 
-  galaxy_tags: ['asterisk', 'pbx', 'build', 'source', 'from-source']
+  galaxy_tags: ['asterisk']
     # List tags for your role here, one per line. A tag is
     # a keyword that describes and categorizes the role.
     # Users find roles by searching for tags. Be sure to
